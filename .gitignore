@@ -1,0 +1,3 @@
+FlaskBackend/tiki/tiki.db
+FlaskBackend/indices/*.index
+**/__pycache__/
