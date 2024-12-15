@@ -14,5 +14,3 @@ How to run Flask Backend API server:
 3. Run server
 - From VSCode terminal (virtual environment activated), type "flask run --cert=cert.pem --key=key.pem --debug"
 - You can access the api from frontend or test api from Postman, ... now
-
-Link github
