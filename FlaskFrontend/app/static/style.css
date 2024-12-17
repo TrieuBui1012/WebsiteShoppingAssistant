@@ -70,11 +70,19 @@ nav ul li a:hover {
     align-items: center;
     justify-items: left;
     padding: 8px 12px;
-    border: none;
+    border: 1px solid #ccc;
+    border-right: none;
     border-radius: 4px 0 0 4px;
     width: 600px;
     font-size: 16px;
     box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    
+    /* Placeholder styling */
+    ::placeholder {
+        color: #999;
+        font-style: italic;
+    }
 
     margin-bottom: 0px;
 }
@@ -84,7 +92,11 @@ nav ul li a:hover {
     align-items: center;
     justify-items: center;
     padding: 8px 12px;
-    border: none;
+    border: 1px solid #ccc; /* Matching border color */
+    border-left: none;
+    background-color: #007BFF; /* Primary color for button */
+    color: #fff; /* White text */
+    transition: background-color 0.3s, transform 0.2s;
     background-color: #fff;
     border-radius: 0 4px 4px 0;
     cursor: pointer;
@@ -93,12 +105,18 @@ nav ul li a:hover {
 }
 
 .nav-center button:hover {
-    background-color: #e0e0e0;
+    background-color: #0056b3; /* Darker shade on hover */
+    border: 2px solid #0056b3;
+}
+
+.nav-center button:active {
+    transform: scale(0.98); /* Slightly shrink on click */
 }
 
 .nav-center button img {
     width: 18px; 
     height: 18px;
+    margin-left: 5px; /* Space between text and icon */
 }
 
 /* Content Section */
