@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: chatbot_frontend
+Version: 0.1
+Requires-Dist: langchain-community==0.2.7
+Requires-Dist: langchain-openai==0.1.16
+Requires-Dist: neo4j==5.22.0
+Requires-Dist: streamlit==1.29.0
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"

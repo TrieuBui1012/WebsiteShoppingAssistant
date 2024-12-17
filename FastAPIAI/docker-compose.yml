@@ -1,0 +1,70 @@
+services:
+
+  chatbot_api:
+    build:
+      context: ./chatbot_api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+
+  chatbot_frontend:
+    build:
+      context: ./chatbot_frontend
+    env_file:
+      - .env
+    depends_on:
+      - chatbot_api
+    ports:
+      - "8501:8501"
+
+  cypher_example_portal:
+    build:
+      context: ./cypher_example_portal
+    env_file:
+      - .env
+    ports:
+      - "8502:8502"
+
+
+# x-common-environment: &common-environment
+#   NEO4J_URI: "neo4j+s://6a6c8a14.databases.neo4j.io"
+#   NEO4J_USERNAME: "neo4j"
+#   AURA_INSTANCEID: "6a6c8a14"
+#   AURA_INSTANCENAME: "LLMs"
+#   OPENAI_EMBEDDING: "text-embedding-3-small"
+#   CHATBOT_URL: "http://chatbot_api:8000/market-rag-agent"
+#   HOSPITAL_AGENT_MODEL: "gpt-4o-mini"
+#   HOSPITAL_CYPHER_MODEL: "gpt-4o-mini"
+#   HOSPITAL_QA_MODEL: "gpt-4o-mini"
+#   NEO4J_CYPHER_EXAMPLES_INDEX_NAME: "questions"
+#   NEO4J_CYPHER_EXAMPLES_NODE_NAME: "Question"
+#   NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY: "question"
+#   NEO4J_CYPHER_EXAMPLES_METADATA_NAME: "cypher"
+#   NEO4J_PASSWORD: "{{resolve:secretsmanager:NEO4J_PASSWORD:SecretString}}"
+#   OPENAI_API_KEY: "{{resolve:secretsmanager:OPENAI_API_KEY:SecretString}}"
+
+# services:
+
+#   chatbot_api:
+#     image: 381492250919.dkr.ecr.us-east-1.amazonaws.com/chatbot_api:latest
+#     environment:
+#       <<: *common-environment
+#     ports:
+#       - "8000"
+
+#   chatbot_frontend:
+#     image: 381492250919.dkr.ecr.us-east-1.amazonaws.com/chatbot_frontend:latest
+#     environment:
+#       <<: *common-environment
+#     depends_on:
+#       - chatbot_api
+#     ports:
+#       - "8501"
+
+#   cypher_example_portal:
+#     image: 381492250919.dkr.ecr.us-east-1.amazonaws.com/cypher_example_portal:latest
+#     environment:
+#       <<: *common-environment
+#     ports:
+#       - "8502"
