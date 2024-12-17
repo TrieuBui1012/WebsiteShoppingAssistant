@@ -1,7 +1,7 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-import requests
+import requests, markdown
 
 bp = Blueprint('main', __name__)
 BASE_URL = 'https://127.0.0.1:5000'
@@ -97,16 +97,21 @@ def product(origin, productId):
     recommended_products = []
     product = None
     error = None
+    summary = None
 
     product = requests.request('GET', BASE_URL + f'/api/product/{origin}/product/{productId}', verify=False)
     product = product.json()['data']
     product['price'] = '{:,.0f}'.format(float(product['price']))
+    payload = {'text': 'Tóm tắt cho tôi sản phẩm "' + product['name'] + '"'}
+    headers = {'Content-Type': 'application/json'}
+    res_summary = requests.request('POST', f'http://127.0.0.1:8082/market-rag-agent', json=payload, headers=headers, verify=False)
+    summary = markdown.markdown(res_summary.json()['output']) 
     res = requests.request('GET', BASE_URL + f'/api/product/recommend_products_by_product_id/{origin}/{productId}', verify=False)
     if res.status_code == 404:
         error = 'Không tìm thấy sản phẩm tương tự nào'
     elif res.status_code != 200:
         error = 'Lỗi hệ thống'
-    
+
     if not error:
         res = res.json()
         recommended_products = res['data']
@@ -114,7 +119,7 @@ def product(origin, productId):
             p['price'] = '{:,.0f}'.format(float(p['price']))
     else:
         flash(error)
-    return render_template('main/product.html', recommended_products=recommended_products, product=product, categories_tiki=categories_tiki, categories_lazada=categories_lazada)
+    return render_template('main/product.html', recommended_products=recommended_products, product=product, categories_tiki=categories_tiki, categories_lazada=categories_lazada, summary=summary)
 
 @bp.route('/track_product/<string:origin>/<int:productId>', methods=('POST',))
 def track_product(origin, productId):

@@ -105,6 +105,11 @@
       margin-left: 5px;
     }
 
+    .product-summary {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
     .product-review {
       font-size: 16px;
       color: #757575;
@@ -282,9 +287,13 @@
         <img src="{{ url_for('static', filename='rating.svg') }}" alt="Star Rating">
       </div>
       <div class="product-review">{{ product['reviewCount'] }} lượt đánh giá</div>
+
       <div class="product-origin">Nơi bán: {{ product['origin'] }}</div>
       <div class="product-brand">Thương hiệu: {{ product['brandName'] }}</div>
       <div class="product-seller">Cửa hàng: {{ product['sellerName'] }}</div>
+      {% if summary %}
+      <div class="product-summary">Tóm tắt sản phẩm (AI summary):<br>{{ summary }}</div>
+      {% endif %}
       <a href="{{ product['link'] }}" target="_blank" data-track-url="{{ url_for('main.track_product', productId=product['productId'], origin=product['origin']) }}" class="purchase-button">Đến nơi bán</a>
     </div>
     {% endif %}

@@ -26,12 +26,11 @@ app = FastAPI(
 # Allow CORS for your frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow your frontend URL
+    allow_origins=["http://127.0.0.1:5001"],  # Thay thế bằng domain frontend của bạn
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],  # Hoặc liệt kê các HTTP method cụ thể (e.g., ["GET", "POST"])
+    allow_headers=["*"],  # Hoặc chỉ định các header được phép (e.g., ["Authorization", "Content-Type"])
 )
-
 
 @async_retry(max_retries=1, delay=1)
 async def invoke_agent_with_retry(input: str, timeout: int = 30):

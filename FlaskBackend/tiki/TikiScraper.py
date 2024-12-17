@@ -287,7 +287,8 @@ def getProductsByCategory(conn: sqlite3.Connection, category_id: int, category_l
         for d in data:
             id = d['id']
             name = d['name'].strip()
-            link = f'https://tiki.vn/{d['url_path']}'
+            link = f"https://tiki.vn/{d['url_path']}"
+
             thumbnail_url = d['thumbnail_url']
             direct_category = category_id
             category_path = str(str(d['primary_category_path']).split('/')[2:])
