@@ -31,24 +31,24 @@ print("call agent step")
 
 
 
-# @tool
-# def explore_marketplace_database(query: str) -> str:
-#     """
-#     Useful when you can easyli extract then name or specific information about the product in the query
-#     Here is few example:
-#     Question: Hãy cho tôi thông tin chung của sản phẩm Chuột Có Dây Logitech B100 - Hàng Chính Hãng
-#         Cypher:
-#         '''
-#         MATCH (p:Product)
-#         WHERE p.name CONTAINS "Chuột Có Dây Logitech B100 - Hàng Chính Hãng"
-#         OPTIONAL MATCH (p)<-[:REVIEWED]-(r:Review)
-#         WITH p, r
-#         ORDER BY r.date DESC // Optional: Order reviews, e.g., by date
-#         RETURN p.specifications p.link AS specifications
-#         '''
-#     """
+@tool
+def explore_marketplace_database(query: str) -> str:
+    """
+    Useful when you can easyli extract then name or specific information about the product in the query
+    Here is few example:
+    Question: Hãy cho tôi thông tin chung của sản phẩm Chuột Có Dây Logitech B100 - Hàng Chính Hãng
+        Cypher:
+        '''
+        MATCH (p:Product)
+        WHERE p.name CONTAINS "Chuột Có Dây Logitech B100 - Hàng Chính Hãng"
+        OPTIONAL MATCH (p)<-[:REVIEWED]-(r:Review)
+        WITH p, r
+        ORDER BY r.date DESC // Optional: Order reviews, e.g., by date
+        RETURN p.specifications p.link AS specifications
+        '''
+    """
 
-#     return get_the_cypher_chain(query)
+    return get_the_cypher_chain(query)
 
 @tool 
 def explore_product_description(query: str) -> str:
@@ -76,20 +76,6 @@ def get_summarize_product(product_name: str) -> str:
     result = get_summarize(product_name)
     return result
 
-# @tool
-# def get_from_database(text: str) -> List[Dict[str, Any]]:
-#     """
-#     Useful query information from databse for answering questions about customers, products, brands, orders,
-#     customer reviews, sales statistics, and product availability. Use the entire prompt
-#     as input to the tool. Or give the overview about the product.
-#     Here is few example:
-#     1. What are the specifications and features of [product_name]
-#     2. How does [product_name] compare to other products in terms of sales?
-#     3. How many products does [brand_name] have listed in our marketplace?
-#     4. What are the most common complaints from customers about [brand_name]?
-#     5. Which products are trending in the [category]?
-#     """
-#     return cypher_summary
 
 
 @tool
@@ -105,9 +91,9 @@ def get_customer_service() -> str:
 def get_memory(session_id):
     return Neo4jChatMessageHistory(session_id=session_id, graph=graph)
 agent_tools = [
-    # explore_marketplace_database,
+    explore_marketplace_database,
     get_summarize_product,
-    explore_product_description,
+    # explore_product_description,
     get_customer_service,
 
 ]

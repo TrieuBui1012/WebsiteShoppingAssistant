@@ -64,8 +64,22 @@ follow as with statement (e.g. WITH v as visit, c.billing_amount as
 billing_amount)
 - If you need to divide numbers, make sure to filter the denominator to be non
 zero.
+- Always limit the number of the MATCH by 5
 
+for example:
+cypher
+Find product in the usb category:
+MATCH (p:Product)-[:BELONG_TO]->(c:Category)
+WHERE c.name CONTAINS 'USB'
+RETURN p.name AS product_name, p.specifications AS specifications, p.rating_average as rating_average, p.brand_name as brand_name, p.link AS product_link, p.price AS product_price LIMIT 5
 The question is:
+
+
+Example looking product suitale for officer
+MATCH (p:Product)-[:BELONG_TO]->(c:Category)
+WHERE (c.name CONTAINS 'Office' OR c.name CONTAINS 'Work' OR p.description CONTAINS 'ergonomic' OR p.description CONTAINS 'keyboard' OR p.description CONTAINS 'mouse')
+RETURN p.name AS product_name, p.description AS product_description, p.price AS product_price
+LIMIT 10
 """
 
 
@@ -104,9 +118,9 @@ Helpful Answer:
 """
 
 
-# qa_generation_prompt = PromptTemplate(
-#     input_variables=["context", "input"], template=qa_generation_template
-# )
+qa_generation_prompt = PromptTemplate(
+    input_variables=["context", "input"], template=qa_generation_template
+)
 
 # product_cypher_chain = GraphCypherQAChain.from_llm(
 #     cypher_llm=get_cypher_model_function(),
@@ -124,6 +138,8 @@ Helpful Answer:
 
 chain = GraphCypherQAChain.from_llm(
     llm=get_model_function(),
+    cypher_prompt=cypher_generation_prompt,
+    qa_prompt=qa_generation_prompt,
     graph=graph,
     verbose=True,
     use_function_response=True,

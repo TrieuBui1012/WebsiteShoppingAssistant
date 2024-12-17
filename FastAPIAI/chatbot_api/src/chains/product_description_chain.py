@@ -42,10 +42,10 @@ neo4j_vector_index = Neo4jVector.from_existing_graph(
     """,
     embedding_node_property="description_embedding",
 )
-# chunk_retriever = neo4j_vector_index.as_retriever(search_type="similarity_score_threshold",
-#                                                     search_kwargs={'score_threshold': 0.2,
-#                                                                    'k': 5,})
-chunk_retriever = neo4j_vector_index.as_retriever(search_kwargs={'k': 4})
+chunk_retriever = neo4j_vector_index.as_retriever(search_type="similarity_score_threshold",
+                                                    search_kwargs={'score_threshold': 0.2,
+                                                                   'k': 5,})
+# chunk_retriever = neo4j_vector_index.as_retriever(search_kwargs={'k': 4})
 
 def get_product_by_description():
     return chunk_retriever
