@@ -414,6 +414,29 @@ def recommend_products_by_history():
         return {"success": False, "message": "No products found."}, 404
     return {"success": True, "data": res}, 200
 
+@bp.route('/recommend_products')
+def recommend_products():
+    products = Product.Product.recommend_products_no_login()
+    res = []
+    for p in products:
+        res.append(
+            {
+                "productId": p.productId,
+                "origin": p.origin,
+                "imgURL": p.imgURL,
+                "name": p.name,
+                "quantitySold": p.quantitySold,
+                "price": p.price,
+                "reviewCount": p.reviewCount,
+                "rating": p.rating
+            }
+        )
+    if res:
+        return {"success": True, "data": res}, 200
+    else:
+        return {"success": False, "message": "No products found."}, 404
+
+
 @bp.route('/recommend_products_by_product_id/<string:origin>/<int:productId>')
 def recommend_products_by_product_id(origin: str, productId: int):
     """

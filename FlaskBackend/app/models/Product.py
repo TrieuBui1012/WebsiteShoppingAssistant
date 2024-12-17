@@ -134,3 +134,19 @@ class Product():
             return None
         else:
             return Product(product['productId'], product['origin'], product['imgURL'], product['name'], product['link'], product['quantitySold'], product['price'], product['reviewCount'], product['rating'], product['sellerName'], product['brandName'], product['createAt'])
+        
+    @classmethod
+    def recommend_products_no_login(cls):
+        k = 90
+        db = get_db()
+        with db.cursor(dictionary=True) as cursor:
+            cursor.execute(
+                f'SELECT * FROM Product LIMIT {k}',
+            )
+            products = cursor.fetchall()
+        res = []
+        for p in products:
+            res.append(
+                Product(p['productId'], p['origin'], p['imgURL'], p['name'], p['link'], p['quantitySold'], p['price'], p['reviewCount'], p['rating'], p['sellerName'], p['brandName'], p['createAt'])
+            )
+        return res

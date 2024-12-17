@@ -31,7 +31,11 @@ def index():
         elif res.status_code != 200:
             error = 'Lỗi hệ thống'
     else:
-        error = 'Bạn cần đăng nhập để xem các sản phẩm đề xuất'
+        res = requests.request('GET', BASE_URL + '/api/product/recommend_products', verify=False)
+        if res.status_code == 404:
+            error = 'Không tìm thấy sản phẩm đề xuất nào'
+        elif res.status_code != 200:
+            error = 'Lỗi hệ thống'
     
     if not error:
         res = res.json()
