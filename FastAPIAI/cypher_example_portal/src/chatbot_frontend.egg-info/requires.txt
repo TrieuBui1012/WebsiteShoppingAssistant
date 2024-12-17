@@ -1,0 +1,7 @@
+langchain-community==0.2.7
+langchain-openai==0.1.16
+neo4j==5.22.0
+streamlit==1.29.0
+
+[dev]
+black
