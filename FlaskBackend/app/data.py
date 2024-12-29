@@ -12,6 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 from .models import *
 from tiki import TikiScraper
 from lazada import LazadaScraper, preprocess_data
+import math
 
 bp = Blueprint('data', __name__, url_prefix='/api/data')
 
@@ -168,17 +169,7 @@ def load_lazada():
 @admin_login_required
 def create_index():
     """
-    Create search and recommendation indices.
-
-    This function will create two indices, one for search and one for recommendation.
-
-    The search index is a flat index with 384 dimensions, each dimension is the
-    sentence embedding of the product name.
-
-    The recommendation index is a flat index with 488 dimensions, each dimension is
-    the concatenation of the sentence embedding of the product name, the category
-    name, the seller name, the brand name, and the numerical fields (quantitySold,
-    reviewCount, rating).
+    Create search and recommendation indices using FAISS IndexIVFFlat for faster search.
 
     :API: POST /api/data/create_index
 
@@ -194,14 +185,10 @@ def create_index():
     scaler = MinMaxScaler()
 
     search_dim = 384
-    search_index = faiss.IndexFlatIP(search_dim)
-    search_index = faiss.IndexIDMap(search_index)
-
     recommendation_dim = 488
-    recommendation_index = faiss.IndexFlatIP(recommendation_dim)
-    recommendation_index = faiss.IndexIDMap(recommendation_index)
 
     try:
+        # Fetch product data
         products = Product.Product.get_products()
 
         ids = []
@@ -221,33 +208,48 @@ def create_index():
                     name_category_elem += (', ' + categories[ci].name)
                 if ci == len(categories) - 1:
                     name_category_elem += '.'
-            names_categories.append(name_category_elem)      
+            names_categories.append(name_category_elem)
             metadata.append(str.lower(p.origin) + ' ' + str.lower(p.sellerName.replace(' ', '')) + ' ' + str.lower(p.brandName.replace(' ', '')))
             numerical_fields.append([p.quantitySold, p.reviewCount, p.rating])
 
-        names = model.encode(names)
-        names = names.astype(np.float32)
-        ids = np.array(ids).astype(np.int64)
-        names_categories = model.encode(names_categories)
-        names_categories = names_categories.astype(np.float32)
+        # Encode and preprocess vectors
+        names = model.encode(names).astype(np.float32)
+        names_categories = model.encode(names_categories).astype(np.float32)
         metadata = vectorizer.fit_transform(metadata)
-        metadata = svd.fit_transform(metadata)
-        metadata = np.array(metadata).astype(np.float32)
-        numerical_fields = scaler.fit_transform(numerical_fields)
-        numerical_fields = np.array(numerical_fields).astype(np.float32)
-
-        faiss.normalize_L2(names)
-        search_index.add_with_ids(names, ids)
+        metadata = svd.fit_transform(metadata).astype(np.float32)
+        numerical_fields = scaler.fit_transform(numerical_fields).astype(np.float32)
         
+        nlist = int(math.sqrt(len(products)))  # Number of clusters for IndexIVFFlat (adjust based on dataset size)
+        del products
+        nprobe = 15  # Number of clusters to search (adjust for speed/accuracy tradeoff)
+
+        # Create and train IndexIVFFlat for search index
+        faiss.normalize_L2(names)
+        quantizer_search = faiss.IndexFlatL2(search_dim)
+        search_index = faiss.IndexIVFFlat(quantizer_search, search_dim, nlist)
+        search_index.train(names)  # Train the index with product embeddings
+        search_index.add_with_ids(names, np.array(ids).astype(np.int64))  # Add data to the index
+        search_index.nprobe = nprobe  # Set the number of clusters to search
+
+        # Save the search index
         faiss.write_index(search_index, 'indices/search.index')
         del names
 
+        # Create and train IndexIVFFlat for recommendation index
         combined_vectors = np.hstack((names_categories, metadata, numerical_fields))
+        del names_categories, metadata, numerical_fields
         faiss.normalize_L2(combined_vectors)
-        recommendation_index.add_with_ids(combined_vectors, ids)
+        quantizer_recommendation = faiss.IndexFlatL2(recommendation_dim)
+        recommendation_index = faiss.IndexIVFFlat(quantizer_recommendation, recommendation_dim, nlist)
+        recommendation_index.train(combined_vectors)  # Train the index with combined vectors
+        recommendation_index.add_with_ids(combined_vectors, np.array(ids).astype(np.int64))
+        recommendation_index.nprobe = nprobe  # Set the number of clusters to search
+        del ids
 
+        # Save the recommendation index
         faiss.write_index(recommendation_index, 'indices/recommendation.index')
 
+        # Save other components
         joblib.dump(vectorizer, 'indices/vectorizer.joblib')
         joblib.dump(svd, 'indices/svd.joblib')
 
@@ -256,7 +258,7 @@ def create_index():
         return {"success": False, "message": "Cannot take data from database."}, 409
 
     end = time.time()
-    print(f'Thời gian tạo index: {end - start}')
+    print(f'Time to create index: {end - start}')
 
     return {"success": True, "message": "Create index successful!"}, 201
 
