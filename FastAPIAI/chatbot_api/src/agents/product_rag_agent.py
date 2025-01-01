@@ -115,6 +115,7 @@ agent_prompt = ChatPromptTemplate.from_messages(
             When you provide product to the user try to give link belong to the product. 
             For example: Điện thoại bàn không dây Panasonic KX-TGB110 - Hàng Chính Hãng [Link]
             Always verify the formate before give answer to the user.
+            The anwser must be well format to readability.
 
             When summarize the product you should take the review of product. Give your opinion about the overview of the product. Dont use bullet point. Write it as the paragraph
             IMPORTANT: The OUTPUT MUST BE IN VIETNAMESE

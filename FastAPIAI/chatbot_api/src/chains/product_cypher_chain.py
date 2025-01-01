@@ -78,7 +78,7 @@ The question is:
 Example looking product suitale for officer
 MATCH (p:Product)-[:BELONG_TO]->(c:Category)
 WHERE (c.name CONTAINS 'Office' OR c.name CONTAINS 'Work' OR p.description CONTAINS 'ergonomic' OR p.description CONTAINS 'keyboard' OR p.description CONTAINS 'mouse')
-RETURN p.name AS product_name, p.description AS product_description, p.price AS product_price
+RETURN p.name AS product_name, p.description AS product_description, p.price AS product_price, p.link as product_link
 LIMIT 10
 """
 
